@@ -514,7 +514,5 @@ SQLite's normal `.load` discovery path.
 
 ## License
 
-No project licence file is included in this source snapshot. Before
-redistributing the combined work, add an explicit project licence and verify
-the licence obligations of SQLite, JimTcl, `jsqlite`, and the `bc`/`bcl`
+A project LICENSE file is included in this source snapshot. Before redistributing the combined work, verify the licence obligations of SQLite, JimTcl, `jsqlite`, and the `bc`/`bcl`
 dependency.
