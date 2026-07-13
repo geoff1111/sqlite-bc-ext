@@ -1,0 +1,159 @@
+proc round_unit {p} {
+  return [rshift #1 [trunc0 [abs $p]]]
+}
+proc round_parts_trunc {x p} {
+  return [truncs $x [trunc0 [abs $p]]]
+}
+proc round_up {x p} {
+  set p [trunc0 [abs $p]]
+  set t [truncs $x $p]
+  if [eq $t $x] { return $t } {}
+  set u [rshift #1 $p]
+  if [lt $x #0] { 
+    return [sub $t $u] 
+  }
+  return [add $t $u]
+}
+proc round_down {x p} {
+  return [truncs $x [trunc0 [abs $p]]]
+}
+proc round_ceiling {x p} {
+  set p [trunc0 [abs $p]]
+  set t [truncs $x $p]
+  if [eq $t $x] { 
+    return $t 
+  }
+  if [gt $x #0] {
+    return [add $t [rshift #1 $p]]
+  }
+  return $t
+}
+proc round_floor {x p} {
+  set p [trunc0 [abs $p]]
+  set t [truncs $x $p]
+  if [eq $t $x] {
+    return $t
+  }
+  if [lt $x #0] { 
+    return [sub $t [rshift #1 $p]] 
+  }
+  return $t
+}
+proc round_half_up {x p} {
+  set p [trunc0 [abs $p]]
+  set n [lt $x #0]
+  set y [abs $x]
+  set t [truncs $y $p]
+  if [eq $t $y] { 
+    if $n { 
+      return [neg $t] 
+    }
+    return $t 
+  }
+  set u [rshift #1 $p]
+  if [ge [sub $y $t] [div $u #2]] {
+    set t [add $t $u] 
+  }
+  if $n { 
+    return [neg $t]
+  }
+  return $t
+}
+proc round_half_down {x p} {
+  set p [trunc0 [abs $p]]
+  set n [lt $x #0]
+  set y [abs $x]
+  set t [truncs $y $p]
+  if [eq $t $y] { 
+    if $n { 
+      return [neg $t]
+    }
+    return $t 
+  }
+  set u [rshift #1 $p]
+  if [gt [sub $y $t] [div $u #2]] { 
+    set t [add $t $u] 
+  }
+  if $n { 
+    return [neg $t] 
+  }
+  return $t
+}
+proc round_half_even {x p} {
+  set p [trunc0 [abs $p]]
+  set n [lt $x #0]
+  set y [abs $x]
+  set t [truncs $y $p]
+  if [eq $t $y] { 
+    if $n { 
+      return [neg $t] 
+    }
+    return $t
+  }
+  set u [rshift #1 $p]
+  set d [sub $y $t]
+  set h [div $u #2]
+  if [gt $d $h] { 
+    set t [add $t $u] 
+  } {
+    if [eq $d $h] {
+      set old [get_scale]
+      set_scale #0
+      set q [div $t $u]
+      set odd [eq [mod $q #2] #1]
+      set_scale $old
+      if $odd { 
+        set t [add $t $u]
+      }
+    }
+  }
+  if $n { 
+    return [neg $t] 
+  }
+  return $t
+}
+proc round_05up {x p} {
+  set p [trunc0 [abs $p]]
+  set n [lt $x #0]
+  set y [abs $x]
+  set t [truncs $y $p]
+  if [eq $t $y] { 
+    if $n { 
+      return [neg $t] 
+    }
+    return $t 
+  }
+  set u [rshift #1 $p]
+  set old [get_scale]
+  set_scale #0
+  set q [div $t $u]
+  set last [mod $q #10]
+  set_scale $old
+  if [eq $last #0] { 
+    set t [add $t $u] 
+  } {
+    if [eq $last #5] { 
+      set t [add $t $u] 
+    }
+  }
+  if $n { 
+    return [neg $t]
+  }
+  return $t
+}
+proc round_trunc {x p} {
+  return [truncs $x [trunc0 [abs $p]]]
+}
+proc round_mode {x p mode} {
+  set mode [trunc0 $mode]
+  if [eq $mode #0] { return [round_up $x $p] }
+  if [eq $mode #1] { return [round_down $x $p] }
+  if [eq $mode #2] { return [round_ceiling $x $p] }
+  if [eq $mode #3] { return [round_floor $x $p] }
+  if [eq $mode #4] { return [round_half_up $x $p] }
+  if [eq $mode #5] { return [round_half_down $x $p] }
+  if [eq $mode #6] { return [round_half_even $x $p] }
+  if [eq $mode #7] { return [round_05up $x $p] }
+  if [eq $mode #8] { return [round_trunc $x $p] }
+  return [div #1 #0]
+}

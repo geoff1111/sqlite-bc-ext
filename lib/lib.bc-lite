@@ -1,0 +1,216 @@
+proc e {x} {
+  set n #0
+  if [lt $x #0] { 
+    set n #1
+    set x [neg $x]
+  }
+  set old [get_scale]
+  set r [add [add #6 $old] [mul #.44 $x]]
+  set xs [num_scale $x]
+  set ws [add $xs #1]
+  set_scale $ws
+  set d #0
+  loop {
+    if [le $x #1] { 
+      break 
+    }
+    set d [add $d #1]
+    set x [div $x #2]
+    set ws [add [get_scale] #1]
+    set_scale $ws
+  }
+  set_scale $r
+  set r [add $x #1]
+  set p $x
+  set f #1
+  set v #1
+  set i #2
+  loop {
+    if [eq $v #0] {
+      break 
+    }
+    set p [mul $p $x]
+    set f [mul $f $i]
+    set v [div $p $f]
+    set r [add $r $v]
+    set i [add $i #1]
+  }
+  loop {
+    if [eq $d #0] { break } {}
+    set r [mul $r $r]
+    set d [sub $d #1]
+  }
+  set_scale $old
+  if $n { 
+    return [div #1 $r]
+  }
+  return [div $r #1]
+}
+
+proc l {x} {
+  if [le $x #0] {
+    set z [pow #10 [get_scale]]
+    return [div [sub #1 $z] #1]
+  }
+  set old [get_scale]
+  set_scale [add $old #6]
+  set p #2
+  loop {
+    if [lt $x #2] {
+      break
+    }
+    set p [mul $p #2]
+    set x [sqrt $x]
+  }
+  loop {
+    if [gt $x #.5] {
+      break
+    }
+    set p [mul $p #2]
+    set x [sqrt $x]
+  }
+  set a [div [sub $x #1] [add $x #1]]
+  set r $a
+  set q [mul $a $a]
+  set v #1
+  set i #3
+  loop {
+    if [eq $v #0] {
+      break 
+    }
+    set a [mul $a $q]
+    set v [div $a $i]
+    set r [add $r $v]
+    set i [add $i #2]
+  }
+  set r [mul $r $p]
+  set_scale $old
+  return [div $r #1]
+}
+
+proc s {x} {
+  if [lt $x #0] {
+    return [neg [s [neg $x]]]
+  }
+  set old [get_scale]
+  set work [add [div [mul #11 $old] #10] #2]
+  set_scale $work
+  set pi4 [a #1]
+  set_scale #0
+  set q [div [add [div $x $pi4] #2] #4]
+  set x [sub $x [mul [mul #4 $q] $pi4]]
+  if [ne [mod $q #2] #0] {
+    set x [neg $x]
+  }
+  set_scale [add $old #2]
+  set r $x
+  set term $x
+  set q [neg [mul $x $x]]
+  set i #3
+  loop {
+    if [eq $term #0] {
+      break
+    }
+    set term [mul $term [div $q [mul $i [sub $i #1]]]]
+    set r [add $r $term]
+    set i [add $i #2]
+  }
+  set_scale $old
+  return [div $r #1]
+}
+
+proc c {x} {
+  set old [get_scale]
+  set_scale [div [mul $old #12] #10]
+  set x [s [add [mul #2 [a #1]] $x]]
+  set_scale $old
+  return [div $x #1]
+}
+
+proc a {x} {
+  set n #1
+  if [lt $x #0] { 
+    set n #-1
+    set x [neg $x]
+  }
+  set old [get_scale]
+  if [lt $old #65] {
+    if [eq $x #1] {
+      return [div #.7853981633974483096156608458198757210492923498437764552437361480 $n]
+    }
+    if [eq $x #.2] { 
+      return [div #.1973955598498807583700497651947902934475851037878521015176889402 $n]
+    }
+  }
+  set m #0
+  set aa #0
+  if [gt $x #.2] { 
+    set_scale [add $old #5]
+    set aa [a #.2]
+  }
+  set_scale [add $old #3]
+  loop {
+    if [le $x #.2] {
+      break
+    }
+    set m [add $m #1]
+    set x [div [sub $x #.2] [add #1 [mul #.2 $x]]]
+  }
+  set r $x
+  set u $x
+  set f [neg [mul $x $x]]
+  set t #1
+  set i #3
+  loop {
+    if [eq $t #0] {
+      break 
+    }
+    set u [mul $u $f]
+    set t [div $u $i]
+    set r [add $r $t]
+    set i [add $i #2]
+  }
+  set_scale $old
+  return [div [add [mul $m $aa] $r] $n]
+}
+
+proc j {n x} {
+  set old [get_scale]
+  set_scale #0
+  set n [div $n #1]
+  set odd #0
+  if [lt $n #0] {
+    set n [neg $n]
+    set odd [mod $n #2]
+  }
+  set fact #1
+  set i #2
+  loop {
+    if [gt $i $n] {
+      break
+    }
+    set fact [mul $fact $i]
+    set i [add $i #1]
+  }
+  set_scale [div [mul #15 $old] #10]
+  set lead [div [div [pow $x $n] [pow #2 $n]] $fact]
+  set r #1
+  set v #1
+  set f [div [neg [mul $x $x]] #4]
+  set extra [sub [length $lead] [num_scale $lead]]
+  set_scale [add [get_scale] $extra]
+  set i #1
+  loop {
+    if [eq $v #0] {
+      break 
+    }
+    set v [div [div [mul $v $f] $i] [add $n $i]]
+    set r [add $r $v]
+    set i [add $i #1]
+  }
+  set_scale $old
+  if $odd {
+    set lead [neg $lead]
+  }
+  return [div [mul $lead $r] #1]
+}

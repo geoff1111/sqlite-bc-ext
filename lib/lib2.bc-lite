@@ -1,0 +1,672 @@
+proc trunc0 {x} {
+  set s [get_scale]
+  set_scale #0
+  set x [div $x #1]
+  set_scale $s
+  return $x
+}
+proc truncs {x p} {
+  if [eq $x #0] {
+    return #0
+  }
+  set s [get_scale]
+  set_scale [abs [trunc0 $p]]
+  set x [div $x #1]
+  set_scale $s
+  return $x
+}
+proc p {x y} {
+  if [eq $y #0] {
+    return [truncs #1 [get_scale]]
+  }
+  if [eq $x #0] {
+    if [gt $y #0] {
+      return #0
+    }
+    return [div #1 #0]
+  }
+  set a [trunc0 $y]
+  if [eq $y $a] { 
+    return [truncs [pow $x $a] [get_scale]]
+  }
+  set z #0
+  if [lt $x #1] {
+    set y [neg $y]
+    set a [neg $a]
+    set z $x
+    set x [div #1 $x]
+  }
+  if [lt $y #0] {
+    return [e [mul $y [l $x]]]
+  }
+  set i [pow $x $a]
+  set s [get_scale]
+  set_scale [add [add $s [length $i]] #5]
+  if $z {
+    set x [div #1 $z]
+    set i [pow $x $a]
+  }
+  set i [mul $i [e [mul [sub $y $a] [l $x]]]]
+  set_scale $s
+  return [div $i #1]
+}
+proc r {x p} {
+  if [eq $x #0] {
+    return $x
+  }
+  set p [trunc0 [abs $p]]
+  set n [lt $x #0]
+  set x [abs $x]
+  set t [truncs $x $p]
+  if [lt $p [num_scale $x]] {
+    set d [sub $x $t]
+    set h [rshift #5 [add $p #1]]
+    if [ge $d $h] { set t [add $t [rshift #1 $p]] } {}
+  }
+  if $n {
+    set t [neg $t] 
+  }
+  return $t
+}
+proc ceil {x p} {
+  if [eq $x #0] {
+    return $x
+  }
+  set p [trunc0 [abs $p]]
+  set n [lt $x #0]
+  set x [abs $x]
+  set t [truncs $x $p]
+  if [lt $t $x] {
+    set t [add $t [rshift #1 $p]]
+  }
+  if $n { 
+    set t [neg $t]
+  }
+  return $t
+}
+proc f {n} {
+  set n [trunc0 [abs $n]]
+  set v #1
+  loop {
+    if [le $n #1] { 
+      break
+    }
+    set v [mul $v $n]
+    set n [sub $n #1]
+  }
+  return $v
+}
+proc max {a b} { 
+  if [gt $a $b] {
+    return $a
+  }
+  return $b
+}
+
+proc min {a b} {
+  if [lt $a $b] {
+    return $a 
+  }
+  return $b 
+}
+
+proc perm {n k} {
+  if [gt $k $n] {
+    return #0
+  }
+  set n [trunc0 [abs $n]]
+  set k [trunc0 [abs $k]]
+  set ff [f $n]
+  set gg [f [sub $n $k]]
+  set s [get_scale]
+  set_scale #0
+  set ff [div $ff $gg]
+  set_scale $s
+  return $ff
+}
+
+proc comb {n rr} {
+  if [gt $rr $n] {
+    return #0
+  }
+  set n [trunc0 [abs $n]]
+  set rr [trunc0 [abs $rr]]
+  set ff [f $n]
+  set hh [f $rr]
+  set gg [f [sub $n $rr]]
+  set s [get_scale]
+  set_scale #0
+  set ff [div $ff [mul $hh $gg]]
+  set_scale $s
+  return $ff
+}
+
+proc fib {n} {
+  if [eq $n #0] {
+    return #0
+  }
+  set n [trunc0 [abs $n]]
+  set t #1
+  set pp #0
+  set i #1
+  loop {
+    if [ge $i $n] {
+      break
+    }
+    set rr $pp
+    set pp $t
+    set t [add $t $rr]
+    set i [add $i #1]
+  }
+  return $t
+}
+proc log {x b} {
+  set s [get_scale]
+  set w $s
+  if [lt $w #20] { 
+    set w #20
+  }
+  if [gt [num_scale $x] $w] {
+    set w [num_scale $x]
+  }
+  set_scale [mul $w #2]
+  set pp [div [l $x] [l $b]]
+  set_scale $s
+  return [truncs $pp $s]
+}
+
+proc l2 {x} { 
+  return [log $x #2] 
+}
+
+proc l10 {x} { 
+  return [log $x #10] 
+}
+
+proc root {x n} {
+  if [lt $n #0] { 
+    return [sqrt $n] 
+  }
+  set n [trunc0 $n]
+  if [eq $n #0] {
+    return [div $x $n] 
+  }
+  if [eq $x #0] { 
+    return #0 
+  }
+  if [eq $n #1] {
+    return $x 
+  }
+  if [eq $n #2] {
+    return [sqrt $x]
+  }
+  set s [get_scale]
+  if [lt $x #0] {
+    set ss [get_scale]
+    set_scale #0
+    set even [eq [mod $n #2] #0]
+    set_scale $ss
+    if $even { 
+      return [sqrt $x] 
+    }
+  }
+  set_scale [add [add $s [num_scale $x]] #5]
+  set tt [add $s #5]
+  set negx [lt $x #0]
+  set x [abs $x]
+  set pp [sub $n #1]
+  set digits [length [trunc0 $x]]
+  set q [pow #10 [trunc0 [ceil [div $digits $n] #0]]]
+  set rr #0
+  loop {
+    if [eq [truncs $rr $tt] [truncs $q $tt]] { 
+      break 
+    }
+    set rr $q
+    set q [div [add [mul $pp $rr] [div $x [pow $rr $pp]]] $n]
+  }
+  if $negx { 
+    set rr [neg $rr] 
+  }
+  set_scale $s
+  return [div $rr #1]
+}
+
+proc cbrt {x} { 
+  return [root $x #3]
+}
+
+proc gcd {a b} {
+  if [eq $b #0] {
+    return $a
+  }
+  set s [get_scale]
+  set_scale #0
+  set a [trunc0 [abs $a]]
+  set b [trunc0 [abs $b]]
+  if [lt $a $b] { 
+    set g $a
+    set a $b
+    set b $g
+  }
+  loop {
+    if [eq $b #0] {
+      break
+    }
+    set g [mod $a $b]
+    set a $b
+    set b $g
+  }
+  set_scale $s
+  return $a
+}
+
+proc lcm {a b} {
+  if [eq $a #0] {
+    if [eq $b #0] {
+      return #0 
+    }
+  }
+  set s [get_scale]
+  set_scale #0
+  set a [trunc0 [abs $a]]
+  set b [trunc0 [abs $b]]
+  set v [div [mul $a $b] [gcd $a $b]]
+  set_scale $s
+  return $v
+}
+
+proc pi {s} {
+  if [eq $s #0] {
+    return #3 
+  }
+  set s [trunc0 [abs $s]]
+  set old [get_scale]
+  set_scale [add $s #1]
+  set v [mul #4 [a #1]]
+  set_scale $old
+  return [truncs $v $s]
+}
+
+proc t {x} {
+  set old [get_scale]
+  set_scale [add $old #2]
+  set ss [s $x]
+  set cc [c $x]
+  set_scale $old
+  return [div $ss $cc]
+}
+
+proc a2 {y x} {
+  if [eq $y #0] { 
+    if [gt $x #0] { 
+      return #0
+    }
+  }
+  if [eq $x #0] { 
+    if [eq $y #0] {
+      return [div $y $x]
+    }
+  }
+  set pp #0
+  if [le $x #0] {
+    set pp [pi [add [get_scale] #2]]
+    if [lt $y #0] { 
+      set pp [neg $pp] 
+    }
+  }
+  if [eq $x #0] { 
+    set aa [div $pp #2]
+  } {
+    set old [get_scale]
+    set_scale [add $old #2]
+    set aa [add [a [div $y $x]] $pp]
+    set_scale $old
+  }
+  return [div $aa #1]
+}
+
+proc sin {x} { 
+  return [s $x] 
+}
+
+proc cos {x} { 
+  return [c $x] 
+}
+
+proc atan {x} { 
+  return [a $x]
+}
+
+proc tan {x} {
+  return [t $x] 
+}
+
+proc atan2 {y x} {
+  return [a2 $y $x] 
+}
+
+proc r2d {x} {
+  set old [get_scale]
+  set_scale [add $old #5]
+  set v [div [mul $x #180] [pi [get_scale]]]
+  set_scale $old
+  return [div $v #1]
+}
+
+proc d2r {x} {
+  set old [get_scale]
+  set_scale [add $old #5]
+  set v [div [mul $x [pi [get_scale]]] #180]
+  set_scale $old
+  return [div $v #1]
+}
+
+proc i2rand {aa bb} {
+  set aa [trunc0 $aa]
+  set bb [trunc0 $bb]
+  if [eq $aa $bb] { 
+    return $aa 
+  }
+  set n [min $aa $bb]
+  set x [max $aa $bb]
+  return [add [irand [add [sub $x $n] #1]] $n]
+}
+
+proc srand {x} { 
+  if [irand #2] { 
+    return [neg $x] 
+  }
+  return $x
+}
+
+proc brand {} { 
+  return [irand #2] 
+}
+
+proc ubytes {x} {
+  set x [trunc0 [abs $x]]
+  set i [pow #2 #8]
+  set pp #1
+  loop {
+    if [ge [sub $i #1] $x] {
+      break
+    }
+    set pp [mul $pp #2]
+    set i [mul $i $i]
+  }
+  return $pp
+}
+
+proc sbytes {x} {
+  set z [lt $x #0]
+  set x [trunc0 [abs $x]]
+  set n [ubytes $x]
+  set pp [pow #2 [sub [mul $n #8] #1]]
+  if [gt $x $pp] { 
+    set n [mul $n #2] 
+  } {
+    if [eq $z #0] { 
+      if [eq $x $pp] { 
+        set n [mul $n #2] 
+      }
+    }
+  }
+  return $n
+}
+
+proc s2un {x n} {
+  set x [trunc0 $x]
+  if [lt $x #0] {
+    set x [abs $x]
+    set old [get_scale]
+    set_scale #0
+    set tt [mul $n #8]
+    set u [pow #2 [sub $tt #1]]
+    if [eq $x $u] { 
+      set_scale $old; return $x
+    }
+    if [gt $x $u] { 
+      set x [mod $x $u]
+    }
+    set x [sub [pow #2 $tt] $x]
+    set_scale $old
+  }
+  return $x
+}
+
+proc s2u {x} {
+  return [s2un $x [sbytes $x]] 
+}
+
+proc band {a b} {
+  set a [trunc0 [abs $a]]
+  set b [trunc0 [abs $b]]
+  set rr #0
+  set pp #1
+  set old [get_scale]
+  set_scale #0
+  loop {
+    if [eq $a #0] { 
+      break 
+    }
+    if [eq $b #0] { 
+      break 
+    }
+    set ma [mod $a #2]
+    set a [div $a #2]
+    if $ma {
+      set mb [mod $b #2]
+      set b [div $b #2]
+      if $mb { 
+        set rr [add $rr $pp] 
+      }
+    } { 
+      set b [div $b #2] 
+    }
+    set pp [mul $pp #2]
+  }
+  set_scale $old
+  return $rr
+}
+
+proc bor {a b} {
+  set a [trunc0 [abs $a]]
+  set b [trunc0 [abs $b]]
+  set rr #0
+  set pp #1
+  set old [get_scale]
+  set_scale #0
+  loop {
+    if [eq $a #0] { 
+      if [eq $b #0] { 
+        break 
+      }
+    }
+    set ma [mod $a #2]
+    set mb [mod $b #2]
+    set a [div $a #2]
+    set b [div $b #2]
+    if [ne [add $ma $mb] #0] { 
+      set rr [add $rr $pp]
+    }
+    set pp [mul $pp #2]
+  }
+  set_scale $old
+  return $rr
+}
+
+proc bxor {a b} {
+  set a [trunc0 [abs $a]]
+  set b [trunc0 [abs $b]]
+  set rr #0
+  set pp #1
+  set old [get_scale]
+  set_scale #0
+  loop {
+    if [eq $a #0] { 
+      if [eq $b #0] { 
+        break 
+      }
+    }
+    set ma [mod $a #2]
+    set mb [mod $b #2]
+    set a [div $a #2]
+    set b [div $b #2]
+    if [eq [add $ma $mb] #1] {
+      set rr [add $rr $pp] 
+    }
+    set pp [mul $pp #2]
+  }
+  set_scale $old
+  return $rr
+}
+
+proc bshl {a b} {
+  return [mul [trunc0 [abs $a]] [pow #2 [trunc0 [abs $b]]]] 
+}
+
+proc bshr {a b} { 
+  return [trunc0 [div [trunc0 [abs $a]] [pow #2 [trunc0 [abs $b]]]]] 
+}
+
+proc bnotn {x n} {
+  set old [get_scale]
+  set_scale #0
+  set width [pow #2 [mul [trunc0 [abs $n]] #8]]
+  set x [mod [add [mod [trunc0 [abs $x]] $width] $width] $width]
+  set rr [sub [sub $width #1] $x]
+  set_scale $old
+  return $rr
+}
+
+proc bnot8 {x} { 
+  return [bnotn $x #1] 
+}
+
+proc bnot16 {x} { 
+  return [bnotn $x #2] 
+}
+
+proc bnot32 {x} { 
+  return [bnotn $x #4] 
+}
+
+proc bnot64 {x} { 
+  return [bnotn $x #8] 
+}
+
+proc bnot {x} { 
+  return [bnotn $x [ubytes $x]] 
+}
+
+proc brevn {x n} {
+  set old [get_scale]
+  set_scale #0
+  set bits [mul [trunc0 [abs $n]] #8]
+  set width [pow #2 $bits]
+  set x [mod [trunc0 [abs $x]] $width]
+  set rr #0
+  set i #0
+  loop {
+    if [ge $i $bits] { 
+      break 
+    }
+    set rr [add [mul $rr #2] [mod $x #2]]
+    set x [div $x #2]
+    set i [add $i #1]
+  }
+  set_scale $old
+  return $rr
+}
+
+proc brev8 {x} { 
+  return [brevn $x #1] 
+}
+
+proc brev16 {x} { 
+  return [brevn $x #2] 
+}
+
+proc brev32 {x} { 
+  return [brevn $x #4] 
+}
+
+proc brev64 {x} { 
+  return [brevn $x #8] 
+}
+
+proc brev {x} { 
+  return [brevn $x [ubytes $x]] 
+}
+
+proc broln {x pp n} {
+  set old [get_scale]
+  set_scale #0
+  set bits [mul [trunc0 [abs $n]] #8]
+  set pp [mod [trunc0 [abs $pp]] $bits]
+  set width [pow #2 $bits]
+  set x [mod [trunc0 [abs $x]] $width]
+  if [eq $pp #0] { 
+    set_scale $old
+    return $x
+  }
+  set left [mod [mul $x [pow #2 $pp]] $width]
+  set right [div $x [pow #2 [sub $bits $pp]]]
+  set x [add $left $right]
+  set_scale $old
+  return $x
+}
+
+proc brol8 {x pp} { return [broln $x $pp #1] }
+
+proc brol16 {x pp} { return [broln $x $pp #2] }
+
+proc brol32 {x pp} { return [broln $x $pp #4] }
+
+proc brol64 {x pp} { return [broln $x $pp #8] }
+
+proc brol {x pp} { return [broln $x $pp [ubytes $x]] }
+
+proc brorn {x pp n} {
+  set old [get_scale]
+  set_scale #0
+  set bits [mul [trunc0 [abs $n]] #8]
+  set pp [mod [trunc0 [abs $pp]] $bits]
+  set width [pow #2 $bits]
+  set x [mod [trunc0 [abs $x]] $width]
+  if [eq $pp #0] { 
+    set_scale $old; return $x 
+  }
+  set right [div $x [pow #2 $pp]]
+  set left [mod [mul $x [pow #2 [sub $bits $pp]]] $width]
+  set x [add $left $right]
+  set_scale $old
+  return $x
+}
+
+proc bror8 {x pp} { return [brorn $x $pp #1] }
+
+proc bror16 {x pp} { return [brorn $x $pp #2] }
+
+proc bror32 {x pp} { return [brorn $x $pp #4] }
+
+proc bror64 {x pp} { return [brorn $x $pp #8] }
+
+proc bror {x pp} { return [brorn $x $pp [ubytes $x]] }
+
+proc bmodn {x n} {
+  set old [get_scale]
+  set_scale #0
+  set x [mod [trunc0 [abs $x]] [pow #2 [mul [trunc0 [abs $n]] #8]]]
+  set_scale $old
+  return $x
+}
+
+proc bmod8 {x} { return [bmodn $x #1] }
+
+proc bmod16 {x} { return [bmodn $x #2] }
+
+proc bmod32 {x} { return [bmodn $x #4] }
+
+proc bmod64 {x} { return [bmodn $x #8] }
