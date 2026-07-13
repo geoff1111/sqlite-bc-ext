@@ -322,7 +322,6 @@ There is no `continue` special form. Put the remainder of the loop body in the o
 ```tcl
 loop {
     if skip-condition {
-        # Do only the step needed before the next iteration.
         set i [add $i 1]
     } {
         normal-body
