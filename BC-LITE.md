@@ -96,6 +96,8 @@ Reading a variable before its first `set` is a compile error. Variables are proc
 
 ## 3. Syntax essentials
 
+There is no support for comments.
+
 Commands are separated by a newline or `;`.
 
 ```tcl
@@ -627,8 +629,6 @@ proc tax_ceiling {x} {
 ```tcl
 proc safe_sqrt {x} {
     if [lt $x 0] {
-        # There is no exception-catching form; choose a documented numeric
-        # sentinel or reject the input at the caller boundary.
         return 0
     }
     return [sqrt $x]
