@@ -105,6 +105,16 @@ set x #1
 set y #2; return [add $x $y]
 ```
 
+A constant number can be in one of two forms:
+
+```tcl
+5
+#5.0
+```
+
+The first form is only available for integers that can fit in a Sqlite2 signed int64. The second string form can be used 
+for any integer or exact decimal number.
+
 A variable reference starts with `$`:
 
 ```tcl
