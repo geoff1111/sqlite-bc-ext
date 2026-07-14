@@ -112,7 +112,7 @@ A constant number can be in one of two forms:
 #5.0
 ```
 
-The first form is only available for integers that can fit in a Sqlite2 signed int64. The second string form can be used 
+The first form is only available for integers that can fit in a Sqlite3 signed int64. The second string form can be used 
 for any integer or exact decimal number.
 
 A variable reference starts with `$`:
