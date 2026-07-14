@@ -23,7 +23,7 @@ A compilation unit is compiled as one transaction:
 - every source placeholder must be resolved before the unit finishes;
 - if any procedure fails to compile, the whole unit is rolled back;
 - procedures successfully installed by an earlier compilation unit remain available;
-- procedure names and arities are fixed once installed unless the owning API explicitly drops and replaces them.
+- procedure names and arities are fixed once installed.
 
 Numeric constants are validated and imported into the connection's BCL context at compile time. Compiled code and constants are connection-local and disappear when the SQLite connection is closed.
 
