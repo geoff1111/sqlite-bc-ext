@@ -121,7 +121,7 @@ list and arities are in `compiler.c`. Common examples include:
 ```text
 add sub mul div mod pow
 neg abs sqrt
-compare equal less less_equal greater greater_equal
+compare eq lt le gt ge
 get_scale set_scale
 state_get state_set
 ```
