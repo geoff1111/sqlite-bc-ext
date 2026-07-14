@@ -12,7 +12,7 @@ proc square {x} {
 }
 
 proc square_plus_one {x} {
-    return [add [square $x] 1]
+    return [add [square $x] #1]
 }
 ```
 
@@ -52,7 +52,7 @@ Use ordinary public names for procedures intended to be called by SQLite or by a
 
 ```tcl
 proc monthly_interest {balance rate} {
-    return [div [mul $balance $rate] 12]
+    return [div [mul $balance $rate] #12]
 }
 ```
 
@@ -87,7 +87,7 @@ proc identity {x} {
 ```tcl
 proc square_plus_one {x} {
     set y [mul $x $x]
-    set y [add $y 1]
+    set y [add $y #1]
     return $y
 }
 ```
@@ -101,8 +101,8 @@ There is no support for comments.
 Commands are separated by a newline or `;`.
 
 ```tcl
-set x 1
-set y 2; return [add $x $y]
+set x #1
+set y #2; return [add $x $y]
 ```
 
 A variable reference starts with `$`:
@@ -114,14 +114,14 @@ $x
 A bracketed command is an expression whose result is supplied to its enclosing command:
 
 ```tcl
-return [add [mul $x $x] 1]
+return [add [mul $x $x] #1]
 ```
 
 Braces delimit argument lists and command bodies. They are grouping syntax, not string values.
 
 Truth is numeric:
 
-- `0` is false;
+- `#0` is false;
 - every non-zero value is true.
 
 ## 4. Core special forms
@@ -134,7 +134,7 @@ Defines a procedure.
 
 ```tcl
 proc add_tax {price rate} {
-    return [mul $price [add 1 $rate]]
+    return [mul $price [add #1 $rate]]
 }
 ```
 
@@ -176,8 +176,8 @@ The else body is optional.
 
 ```tcl
 proc abs_value {x} {
-    if [lt $x 0] {
-        return [sub 0 $x]
+    if [lt $x #0] {
+        return [sub #0 $x]
     }
     return $x
 }
@@ -208,10 +208,10 @@ Exits the nearest enclosing `loop`.
 
 ```tcl
 loop {
-    if [le $x 0] {
+    if [le $x #0] {
         break
     }
-    set x [sub $x 1]
+    set x [sub $x #1]
 }
 ```
 
@@ -240,14 +240,14 @@ Example:
 
 ```tcl
 proc factorial {n} {
-    set result 1
+    set result #1
     loop {
-        if [gt $n 1] {
+        if [gt $n #1] {
         } {
             break
         }
         set result [mul $result $n]
-        set n [sub $n 1]
+        set n [sub $n #1]
     }
     return $result
 }
@@ -301,7 +301,7 @@ Example:
 
 ```tcl
 proc sum_to {n} {
-    set i 1
+    set i #1
     set total 0
     loop {
         if [le $i $n] {
@@ -309,7 +309,7 @@ proc sum_to {n} {
             break
         }
         set total [add $total $i]
-        set i [add $i 1]
+        set i [add $i #1]
     }
     return $total
 }
@@ -322,10 +322,10 @@ There is no `continue` special form. Put the remainder of the loop body in the o
 ```tcl
 loop {
     if skip-condition {
-        set i [add $i 1]
+        set i [add $i #1]
     } {
         normal-body
-        set i [add $i 1]
+        set i [add $i #1]
     }
 }
 ```
@@ -334,8 +334,8 @@ For a long body, a local helper is clearer:
 
 ```tcl
 proc _process_one {value} {
-    if [eq [mod $value 2] 0] {
-        return 0
+    if [eq [mod $value #2] #0] {
+        return #0
     }
     return [mul $value $value]
 }
@@ -347,16 +347,16 @@ Use nested `if` forms:
 
 ```tcl
 proc classify {x} {
-    if [eq $x 1] {
-        return 10
+    if [eq $x #1] {
+        return #10
     } {
-        if [eq $x 2] {
-            return 20
+        if [eq $x #2] {
+            return #20
         } {
-            if [eq $x 3] {
-                return 30
+            if [eq $x #3] {
+                return #30
             } {
-                return 0
+                return #0
             }
         }
     }
@@ -379,10 +379,10 @@ To produce a numeric Boolean:
 proc logical_and {a b} {
     if $a {
         if $b {
-            return 1
+            return #1
         }
     }
-    return 0
+    return #0
 }
 ```
 
@@ -403,9 +403,9 @@ if cond1 {
 ```tcl
 proc logical_not {x} {
     if $x {
-        return 0
+        return #0
     }
-    return 1
+    return #1
 }
 ```
 
@@ -417,8 +417,8 @@ The current scale belongs to the connection-local BCL context. Division, square 
 
 ```tcl
 proc one_third {} {
-    set_scale 20
-    return [div 1 3]
+    set_scale #20
+    return [div #1 #3]
 }
 ```
 
@@ -501,8 +501,8 @@ Typical use:
 
 ```tcl
 proc running_total_step {value} {
-    set total [add [state_get 0] $value]
-    return [state_set 0 $total]
+    set total [add [state_get #0] $value]
+    return [state_set #0 $total]
 }
 ```
 
@@ -606,18 +606,18 @@ All bit procedures operate on integer-valued inputs. Fractional inputs are inval
 | `round_half_down x places` | Nearest; ties toward zero. |
 | `round_half_even x places` | Nearest; ties to an even final retained digit. |
 | `round_half_odd x places` | Nearest; ties to an odd final retained digit. |
-| `round_05up x places` | Away from zero when the final retained digit is `0` or `5`; otherwise toward zero. |
+| `round_05up x places` | Away from zero when the final retained digit is `#0` or `#5`; otherwise toward zero. |
 | `round_trunc x places` | Explicit truncation alias where provided by the library. |
 
 Examples:
 
 ```tcl
 proc money_even {x} {
-    return [round_half_even $x 2]
+    return [round_half_even $x #2]
 }
 
 proc tax_ceiling {x} {
-    return [round_ceiling $x 2]
+    return [round_ceiling $x #2]
 }
 ```
 
@@ -627,8 +627,8 @@ proc tax_ceiling {x} {
 
 ```tcl
 proc safe_sqrt {x} {
-    if [lt $x 0] {
-        return 0
+    if [lt $x #0] {
+        return #0
     }
     return [sqrt $x]
 }
@@ -643,7 +643,7 @@ For multi-step fractional calculations, temporarily use a scale greater than the
 ```tcl
 proc ratio_rounded {a b places} {
     set old_scale [get_scale]
-    set_scale [add $places 8]
+    set_scale [add $places #8]
     set value [div $a $b]
     set result [round_half_even $value $places]
     set_scale $old_scale
@@ -670,7 +670,7 @@ proc sum_of_cubes {a b} {
 At command level, a normal function call executes but its result is popped:
 
 ```tcl
-set_scale 20
+set_scale #20
 ```
 
 Use brackets when the value is needed by another command:
@@ -685,17 +685,17 @@ Recursion and mutual recursion are supported within configured VM limits.
 
 ```tcl
 proc even {n} {
-    if [eq $n 0] {
-        return 1
+    if [eq $n #0] {
+        return #1
     }
-    return [odd [sub $n 1]]
+    return [odd [sub $n #1]]
 }
 
 proc odd {n} {
-    if [eq $n 0] {
-        return 0
+    if [eq $n #0] {
+        return #0
     }
-    return [even [sub $n 1]]
+    return [even [sub $n #1]]
 }
 ```
 
@@ -733,7 +733,7 @@ proc _term {x mean} {
 
 proc bounded_sum_of_squares {start finish mean} {
     set x $start
-    set total 0
+    set total #0
 
     loop {
         if [le $x $finish] {
@@ -742,7 +742,7 @@ proc bounded_sum_of_squares {start finish mean} {
         }
 
         set total [add $total [_term $x $mean]]
-        set x [add $x 1]
+        set x [add $x #1]
     }
 
     return $total
