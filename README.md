@@ -73,6 +73,7 @@ objects; strings are source syntax or external representations, not VM values.
 proc name {arg ...} { body }
 set name value
 if condition { then-body } { else-body }
+if condition { then-body }
 loop { body }
 break
 return value
