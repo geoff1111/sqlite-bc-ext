@@ -1,3 +1,5 @@
+<img src="bc-lite-ext.png" alt="bc-lite-ext-logo" width="25%">
+
 # sqlite_bc_ext
 
 `sqlite_bc_ext` is a Unix/Linux SQLite loadable extension that embeds a small,
