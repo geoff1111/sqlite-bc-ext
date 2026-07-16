@@ -1,3 +1,5 @@
+![bc-lite-logo](bclite-logo.png)
+
 # BC-Lite Programming Manual
 
 BC-Lite is a small, Tcl-inspired language for writing arbitrary-precision decimal procedures for the SQLite BC extension. It is intentionally not a general-purpose scripting language. Every runtime value is numeric, arithmetic is decimal and arbitrary precision, and programs are compiled to the connection-local BC virtual machine.
