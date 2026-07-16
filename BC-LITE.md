@@ -1,4 +1,4 @@
-![bc-lite-logo](bclite-logo.png)
+<img src="bclite-logo.png" alt="bclite-logo" width="25%">
 
 # BC-Lite Programming Manual
 
