@@ -3,8 +3,9 @@
 # sqlite_bc_ext
 
 `sqlite_bc_ext` is a Unix/Linux SQLite loadable extension that embeds a small,
-single-pass compiler and a virtual machine for **BC-Lite**, an exact-decimal
-language utilizing the `bcl` numeric library from Gavin Howard's `bc` project.
+direct, single-pass compiler and a virtual machine for **BC-Lite**, an 
+exact-decimal language utilizing the `bcl` numeric library from Gavin Howard's
+`bc` project.
 
 It lets an application define exact numeric procedures in BC-Lite and expose
 selected user procedures to SQLite as:
