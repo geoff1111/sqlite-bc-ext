@@ -120,14 +120,16 @@ prefix, `#` by default (unless they are an integer value that fits in a
 SQLite3 int64, in which case they can be expressed as a normal integer value):
 
 ```tcl
-set x #12.50
-return [div $x #4]
+proc my_val {} {
+    set x #12.50
+    return [div $x 4]
+}
 ```
 
 The prefix prevents JimTcl, SQLite, or host-language conversion from silently
-turning an exact decimal into a binary floating-point value. Valid prefixes are
-restricted by `sc_numeric_prefix_valid()`; the shipped default is `#`, and the
-tutorial also demonstrates `@`.
+turning an exact decimal into a binary floating-point value or truncated integer.
+Valid prefixes are restricted by `sc_numeric_prefix_valid()`; the shipped 
+default is `#`, and the tutorial also demonstrates `@`.
 
 ### Procedures and name resolution
 
