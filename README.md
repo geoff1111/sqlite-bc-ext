@@ -91,7 +91,8 @@ sqlite> .exit
 
 BC-Lite is a deliberately small procedure language. It compiles directly to
 bytecode for the included stack VM. Runtime values are exact `BclNumber`
-objects; strings are source syntax or external representations, not VM values.
+objects; BC-Lite does not support string values, nor does it support
+compound data types.
 
 ### Special forms
 
