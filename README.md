@@ -115,7 +115,8 @@ proc hypotenuse_squared {a b} {
 ```
 
 Variables are referenced with `$name`. Numeric literals must use the configured
-prefix, `#` by default:
+prefix, `#` by default (unless they are an integer value that fits in a 
+SQLite3 int64, in which case they can be expressed as a normal integer value):
 
 ```tcl
 set x #12.50
