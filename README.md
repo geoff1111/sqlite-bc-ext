@@ -17,6 +17,8 @@ The project also provides a public C API for applications that want to embed
 the compiler, VM, or SQLite adapter directly, plus an interactive JimTcl and
 `jsqlite` tutorial.
 
+This extension was written with assistance from LLM's.
+
 ## Quick start
 
 The default Makefile expects four sibling directories:
