@@ -69,7 +69,7 @@ sqlite> select twice('#1.25');
 sqlite> .exit
 ```
 
-Another example SQLite session calculating pi to 100 decimal places is:
+Another example SQLite session calculating π to 100 decimal places is:
 
 ```sql
 $ sqlite3
