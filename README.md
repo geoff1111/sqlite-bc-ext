@@ -66,6 +66,25 @@ sqlite> select twice(21);
 42
 sqlite> select twice('#1.25');
 #2.50
+sqlite> .exit
+```
+
+Another example SQLite session calculating pi to 100 decimal places is:
+
+```sql
+$ sqlite3
+sqlite> .load ./build/scbclite
+sqlite> select sc_bclite_load('
+   ...> proc pi_scale {x} {
+   ...>   return [pi $x]
+   ...> }
+   ...> ');
+1
+sqlite> select sc_bclite_register_all();
+1
+sqlite> select pi_scale(100);
+#3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679
+sqlite> .exit
 ```
 
 ## What BC-Lite is
