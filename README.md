@@ -52,17 +52,20 @@ build/scbclite.so
 A minimal SQLite session is:
 
 ```sql
-.load ./build/scbclite
-
-select sc_bclite_load('
-proc twice {x} {
-    return [mul $x #2]
-}
-');
-
-select sc_bclite_register_all();
-select twice(21);          -- 42, stored as an SQLite integer
-select twice('#1.25');     -- #2.50, stored as exact prefixed text
+$ sqlite3
+sqlite> .load ./build/scbclite
+sqlite> select sc_bclite_load('
+   ...> proc twice {x} {
+   ...>   return [mul $x #2]
+   ...> }
+   ...> ');
+1
+sqlite> select sc_bclite_register_all();
+1
+sqlite> select twice(21);
+42
+sqlite> select twice('#1.25');
+#2.50
 ```
 
 ## What BC-Lite is
